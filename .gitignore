@@ -3,10 +3,16 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Compiled Binaries/Targets
 *.jar
 *.war
 *.ear
+target/
+depedency-reduced-pom.xml
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+IDEA Files
+.idea/
+*.iml
