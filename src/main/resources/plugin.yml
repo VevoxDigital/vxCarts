@@ -1,0 +1,9 @@
+name: ${name}
+version: ${version}
+main: ${groupId}.${artifactId}.${name}
+
+load: STARTUP
+
+author: ${organization.name}
+website: ${organization.url}
+description: ${description}
