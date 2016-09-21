@@ -1,11 +1,11 @@
-package io.vevox.vx;
+package io.vevox.vx.carts;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * @author Matthew Struble
  */
-public class Carts extends JavaPlugin {
+public class vxCarts extends JavaPlugin {
 
 
 
