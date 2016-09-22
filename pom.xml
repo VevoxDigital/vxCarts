@@ -6,7 +6,7 @@
 
     <groupId>io.vevox.vx</groupId>
     <artifactId>carts</artifactId>
-    <version>1.10.2-R0.1</version>
+    <version>1.10.2-r0.1</version>
     <packaging>jar</packaging>
 
     <name>vxCarts</name>
