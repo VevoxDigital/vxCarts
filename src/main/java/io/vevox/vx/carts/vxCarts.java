@@ -1,5 +1,6 @@
 package io.vevox.vx.carts;
 
+import io.vevox.vx.carts.cmd.CartsCommandDelegator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -7,6 +8,12 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class vxCarts extends JavaPlugin {
 
+  @Override
+  public void onEnable() {
 
+    getLogger().info("Hooking handlers and delegators...");
+    getCommand("carts").setExecutor(new CartsCommandDelegator(this));
+
+  }
 
 }
