@@ -10,6 +10,7 @@ import org.bukkit.inventory.*;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Matthew Struble
@@ -22,8 +23,6 @@ public class RecipesRules {
 
   private static String makePrefixString(NBTTagCompound compound, boolean isCondition) {
     StringBuilder builder = new StringBuilder();
-    System.out.println(compound.getString("prefix"));
-    System.out.println(compound.get("prefix").toString());
     RulePrefix prefix = RulePrefix.valueOf(compound.getString("prefix"));
     builder.append(ChatColor.YELLOW)
         .append(isCondition ? "IF" : "THEN").append(' ')
@@ -32,7 +31,7 @@ public class RecipesRules {
     if (compound.hasKey("value"))
       builder.append('=').append(compound.get("value").toString());
     return builder.toString();
-}
+  }
 
   private static void updateItemMeta(ItemStack item) {
     if (item.getTag() == null) return;
@@ -50,8 +49,7 @@ public class RecipesRules {
     item.getTag().set("display", display);
   }
 
-  public static void registerRecipes() {
-    // Create a rule
+  private static ItemStack getDefaultRule() {
     // TODO Make the rule crafting item configurable.
     ItemStack newRule = new ItemStack(Items.PAPER);
     NBTTagCompound rule = new NBTTagCompound();
@@ -63,52 +61,103 @@ public class RecipesRules {
     tag.set("cartRule", rule);
     newRule.setTag(tag);
     updateItemMeta(newRule);
-    CraftingManager.getInstance().registerShapelessRecipe(newRule, Items.REDSTONE, Items.PAPER);
-
+    return newRule;
   }
 
-  static class CopyRule implements IRecipe {
+  public static void registerRecipes() {
+    CraftingManager.getInstance().registerShapelessRecipe(getDefaultRule(), Items.REDSTONE, Items.PAPER);
+    CraftingManager.getInstance().a(new CopyRule());
+  }
+
+  private static class CopyRule implements IRecipe {
+
+    @Nullable
+    private ItemStack[] getRuleAndBlank(InventoryCrafting inventoryCrafting) {
+      ItemStack rule = null, blank = null;
+      ItemStack redstone = null;
+
+      for (int i = 0; i < inventoryCrafting.getSize(); i++) {
+        ItemStack stack = inventoryCrafting.getItem(i);
+        if (stack != null) {
+          if (stack.getItem() == Items.REDSTONE) {
+            if (redstone != null) return null;
+            redstone = stack;
+            continue;
+          }
+          if (stack.getItem() != Items.PAPER) return null;
+          if (rule != null && blank != null) return null;
+
+          NBTTagCompound tag = stack.getTag();
+          boolean flag = tag != null && tag.get("cartRule") != null;
+
+          if (rule != null) {
+            if (flag) return null;
+            blank = stack;
+          } else if (blank != null) {
+            if (!flag) return null;
+            rule = stack;
+          } else if (flag) rule = stack;
+          else blank = stack;
+        }
+      }
+
+      if (rule == null || blank == null || redstone == null) return null;
+      return new ItemStack[]{ rule, blank };
+    }
+
     // matches
     // Checks if crafting window is valid.
     @Override
     public boolean a(InventoryCrafting inventoryCrafting, World world) {
-      return false;
+      return getRuleAndBlank(inventoryCrafting) != null;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Nullable
     @Override
     public ItemStack craftItem(InventoryCrafting inventoryCrafting) {
-      return new ItemStack(Block.getByName("stone"));
+      return getRuleAndBlank(inventoryCrafting)[0].cloneItemStack();
     }
 
     // getRecipeSize
     // Gets the size of the recipe area
     @Override
     public int a() {
-      return 0;
+      return 4;
     }
 
     // getRecipeOutput
     @Nullable
     @Override
     public ItemStack b() {
-      return null;
+      return getDefaultRule();
     }
 
     // getRemainingItems
     @Override
     public net.minecraft.server.v1_10_R1.ItemStack[] b(InventoryCrafting inventoryCrafting) {
-      return new net.minecraft.server.v1_10_R1.ItemStack[0];
+      ItemStack[] remaining = new ItemStack[inventoryCrafting.getSize()];
+      for (int i = 0; i < remaining.length; i++) {
+        ItemStack stack = inventoryCrafting.getItem(i);
+        if (stack != null && stack.getTag() != null && stack.getTag().get("cartRule") != null) {
+          remaining[i] = stack.cloneItemStack();
+          remaining[i].count = 1;
+        }
+      }
+      return remaining;
     }
 
     @Override
     public Recipe toBukkitRecipe() {
-      return null;
+      return new ShapelessRecipe(CraftItemStack.asBukkitCopy(b()));
     }
 
     @Override
     public List<net.minecraft.server.v1_10_R1.ItemStack> getIngredients() {
-      return Arrays.asList(new ItemStack(Item.REGISTRY.get(new MinecraftKey("paper"))));
+      return Arrays.asList(
+          new ItemStack(Items.PAPER),
+          getDefaultRule()
+      );
     }
   }
 
