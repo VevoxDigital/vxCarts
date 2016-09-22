@@ -3,6 +3,7 @@ package io.vevox.vx.carts.crafting;
 import io.vevox.vx.carts.RulePrefix;
 import net.minecraft.server.v1_10_R1.*;
 import net.minecraft.server.v1_10_R1.ItemStack;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.*;
@@ -17,23 +18,37 @@ import java.util.stream.Collectors;
  */
 public class RecipesRules {
 
-  public static void updateItemMeta(org.bukkit.inventory.ItemStack item) {
-    updateItemMeta(CraftItemStack.asNMSCopy(item));
+  public static boolean isRule(org.bukkit.inventory.ItemStack item) {
+    return isRule(CraftItemStack.asNMSCopy(item));
   }
 
-  private static String makePrefixString(NBTTagCompound compound, boolean isCondition) {
-    StringBuilder builder = new StringBuilder();
-    RulePrefix prefix = RulePrefix.valueOf(compound.getString("prefix"));
-    builder.append(ChatColor.YELLOW)
-        .append(isCondition ? "IF" : "THEN").append(' ')
-        .append(ChatColor.GRAY)
-        .append(prefix.toString().toLowerCase());
-    if (compound.hasKey("value"))
-      builder.append('=').append(compound.get("value").toString());
-    return builder.toString();
+  private static boolean isRule(ItemStack item) {
+    return item.getTag() != null && item.getTag().get("cartRule") != null;
   }
 
-  private static void updateItemMeta(ItemStack item) {
+  public static void setState(ItemStack item, Pair<RulePrefix, Object> state, boolean isCondition) {
+    if (!isRule(item))
+      throw new IllegalArgumentException("Given item is not a rule");
+    RulePrefix prefix = state.getKey();
+    Object value = state.getValue();
+    if (!prefix.acceptsValue(value))
+      throw new IllegalArgumentException(prefix.toString() + " does not accept " + value.toString());
+
+    @SuppressWarnings("ConstantConditions")
+    NBTTagCompound rule = item.getTag().getCompound("cartRule")
+        .getCompound(isCondition ? "condition" : "function");
+
+    rule.remove("value");
+    rule.setString("prefix", prefix.name());
+    if (value != null) {
+      if (value instanceof Boolean) rule.setBoolean("value", (Boolean) value);
+      else if (value instanceof Integer) rule.setInt("value", (Integer) value);
+      else if (value instanceof Double) rule.setDouble("value", (Double) value);
+      else rule.setString("value", value.toString());
+    }
+  }
+
+  public static void updateItemMeta(ItemStack item) {
     if (item.getTag() == null) return;
     NBTTagCompound rules = item.getTag().getCompound("cartRule");
     if (rules == null) return;
@@ -49,12 +64,36 @@ public class RecipesRules {
     item.getTag().set("display", display);
   }
 
+  @SuppressWarnings("ConstantConditions")
+  public static void destroyRule(ItemStack stack) throws IllegalArgumentException {
+    if (!isRule(stack))
+      throw new IllegalArgumentException("Target stack is not a rule");
+    int count = stack.count;
+    stack.count = 1;
+    stack.getTag().remove("display");
+    stack.getTag().remove("cartRule");
+    stack.count = count;
+  }
+
+  private static String makePrefixString(NBTTagCompound compound, boolean isCondition) {
+    StringBuilder builder = new StringBuilder();
+    RulePrefix prefix = RulePrefix.valueOf(compound.getString("prefix"));
+    builder.append(ChatColor.YELLOW)
+        .append(isCondition ? "IF" : "THEN").append(' ')
+        .append(ChatColor.GRAY)
+        .append(prefix.toString().toLowerCase());
+    if (compound.hasKey("value"))
+      builder.append('=').append(compound.get("value") instanceof NBTTagString
+          ? "\"" + compound.getString("value") + "\"" : compound.get("value").toString());
+    return builder.toString();
+  }
+
   private static ItemStack getDefaultRule() {
     // TODO Make the rule crafting item configurable.
     ItemStack newRule = new ItemStack(Items.PAPER);
     NBTTagCompound rule = new NBTTagCompound();
     NBTTagCompound c = new NBTTagCompound();
-    c.set("prefix", new NBTTagString(RulePrefix.DEFAULT.toString()));
+    c.set("prefix", new NBTTagString(RulePrefix.DEFAULT.name()));
     rule.set("condition", c);
     rule.set("function", c.g());
     NBTTagCompound tag = new NBTTagCompound();

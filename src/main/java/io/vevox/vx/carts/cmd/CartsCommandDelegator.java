@@ -76,6 +76,7 @@ public class CartsCommandDelegator implements CommandExecutor {
       case "rules":
       case "r":
         CartRulesCommand.command(sender, (String[]) ArrayUtils.subarray(args, 1, args.length));
+        break;
       default:
         throw new CommandException.UnknownArgumentException(0, args[0]);
     }

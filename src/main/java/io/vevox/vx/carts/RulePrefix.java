@@ -12,23 +12,19 @@ public enum RulePrefix {
    * Function: Have no affect. The cart continues as normal.<br>
    * Accepts nothing.
    */
-  DEFAULT;
+  DEFAULT,
 
-  boolean isCondition() {
-    switch (this) {
-      default: return true;
-    }
-  }
+  /**
+   * Condition: Checks the player's destination<br>
+   * Function: Sets the player's destination<br>
+   * Accepts a string or null.
+   */
+  DESTINATION;
 
-  boolean isFunction() {
+  public boolean acceptsValue(@Nullable Object value) {
     switch (this) {
-      default: return true;
-    }
-  }
-
-  boolean acceptedValue(Object value) {
-    switch (this) {
-      default: return false;
+      case DESTINATION: return value == null || value instanceof String;
+      default: return value == null;
     }
   }
 

@@ -5,9 +5,9 @@ package io.vevox.vx.carts.cmd;
  * @author Matthew Struble
  * @since 1.10.2-r0.1
  */
-abstract class CommandException extends Exception {
+class CommandException extends Exception {
 
-  private CommandException(String msg) { super(msg); }
+  CommandException(String msg) { super(msg); }
 
   /**
    * Exception used when an argument is unknown.
