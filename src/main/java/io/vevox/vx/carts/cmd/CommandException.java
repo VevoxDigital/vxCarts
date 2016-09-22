@@ -26,4 +26,10 @@ abstract class CommandException extends Exception {
     }
   }
 
+  static class ConsoleExecutionException extends CommandException {
+    ConsoleExecutionException() {
+      super("Command must be executed by a player");
+    }
+  }
+
 }
