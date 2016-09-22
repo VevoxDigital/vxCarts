@@ -7,3 +7,30 @@ load: STARTUP
 author: ${organization.name}
 website: ${organization.url}
 description: ${description}
+
+commands:
+  carts:
+    description: Core command for vxCarts
+    aliases: [cart, vc]
+    usage: What was that? Try /carts help
+
+permissions:
+  vx.carts.*:
+    description: All vxCarts functions
+    children:
+      vx.carts.rails: true
+      vx.carts.rules: true
+      vx.carts.admin: true
+  vx.carts.rails:
+    description: Allows application of rules to rails.
+    default: op
+  vx.carts.rules:
+    description: Functions involving cart rules and rulebooks.
+    default: true
+    children:
+      vx.carts.rules.create: true
+      vx.carts.rules.modify: true
+      vx.carts.rules.copy: true
+  vx.carts.admin:
+    description: Administration functions
+    default: op
