@@ -12,19 +12,6 @@ import org.bukkit.command.CommandSender;
  */
 public class CartsCommandDelegator implements CommandDelegator {
 
-  private static class HelpEntry {
-    final String cmd, desc, permission, usage;
-    final boolean isPlayerOnly;
-
-    HelpEntry(String cmd, String desc, String usage, String permission, boolean isPlayerOnly) {
-      this.cmd = cmd;
-      this.desc = desc;
-      this.usage = usage;
-      this.permission = permission;
-      this.isPlayerOnly = isPlayerOnly;
-    }
-  }
-
   private final vxCarts plugin;
 
   public CartsCommandDelegator(vxCarts plugin) {
