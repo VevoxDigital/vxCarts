@@ -22,7 +22,7 @@ public class RecipesRules {
     return isRule(CraftItemStack.asNMSCopy(item));
   }
 
-  private static boolean isRule(ItemStack item) {
+  public static boolean isRule(ItemStack item) {
     return item.getTag() != null && item.getTag().get("cartRule") != null;
   }
 
