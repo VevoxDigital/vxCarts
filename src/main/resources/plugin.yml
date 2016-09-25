@@ -8,6 +8,8 @@ author: ${organization.name}
 website: ${organization.url}
 description: ${description}
 
+depend: [vxLib]
+
 commands:
   carts:
     description: Core command for vxCarts

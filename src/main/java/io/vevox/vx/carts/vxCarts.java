@@ -2,20 +2,22 @@ package io.vevox.vx.carts;
 
 import io.vevox.vx.carts.cmd.CartsCommandDelegator;
 import io.vevox.vx.carts.crafting.RecipesRules;
-import org.bukkit.plugin.java.JavaPlugin;
+import io.vevox.vx.lib.vxPlugin;
 
 /**
  * @author Matthew Struble
  */
-public class vxCarts extends JavaPlugin {
+public class vxCarts extends vxPlugin {
 
-  @Override
-  public void onEnable() {
+  {
+    enable(l -> {
+      logger().info("Hooking handlers and delegators...");
+      getCommand("carts").setExecutor(new CartsCommandDelegator(this));
 
-    getLogger().info("Hooking handlers and delegators...");
-    getCommand("carts").setExecutor(new CartsCommandDelegator(this));
+      RecipesRules.registerRecipes();
 
-    RecipesRules.registerRecipes();
+      return true;
+    });
   }
 
 }

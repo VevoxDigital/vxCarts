@@ -31,6 +31,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>vevox-repo</id>
+            <url>http://a.vevox.io/mvn</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -38,6 +42,11 @@
             <artifactId>spigot</artifactId>
             <version>1.10.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vevox.vx</groupId>
+            <artifactId>lib</artifactId>
+            <version>1.10.2-r0.2</version>
         </dependency>
     </dependencies>
 
