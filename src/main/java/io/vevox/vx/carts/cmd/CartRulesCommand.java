@@ -2,6 +2,7 @@ package io.vevox.vx.carts.cmd;
 
 import io.vevox.vx.carts.RulePrefix;
 import io.vevox.vx.carts.crafting.RecipesRules;
+import io.vevox.vx.lib.cmd.CommandException;
 import net.minecraft.server.v1_10_R1.EntityPlayer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
