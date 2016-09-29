@@ -54,11 +54,12 @@ public class RecipesRules {
     if (rules == null) return;
 
     NBTTagCompound display = new NBTTagCompound();
-    display.set("Name", new NBTTagString(ChatColor.BLUE + "vxCarts Rule"));
+    display.set("Name", new NBTTagString(ChatColor.RESET + "Track Rule"));
 
     NBTTagList lore = new NBTTagList();
     lore.add(new NBTTagString(makePrefixString(rules.getCompound("condition"), true)));
     lore.add(new NBTTagString(makePrefixString(rules.getCompound("function"), false)));
+    lore.add(new NBTTagString(ChatColor.BLUE.toString() + ChatColor.ITALIC + "vxCarts"));
     display.set("Lore", lore);
 
     item.getTag().set("display", display);
